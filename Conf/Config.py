@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2018/7/25 上午10:46
-# @Author  : WangJuan
-# @File    : Config.py
+# @Author: fankang
+# @Time: 2022/6/25 16:27
 
 from configparser import ConfigParser
 from Common import Log
-from Common import Request
 import os
 
 
@@ -29,8 +26,8 @@ class Config:
     VALUE_RECEIVER = "receiver"
     VALUE_USERNAME = "username"
     VALUE_PASSWORD = "password"
+    VALUE_AUTHORIZATION = ""
 
-    request = Request
 
     # path
     path_dir = str(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
@@ -101,21 +98,3 @@ class Config:
         with open(self.conf_path, "w+") as f:
             return self.config.write(f)
 
-    def get_token(self, email):
-        """
-        获取登录token
-        :param email: 用户邮箱
-        :return: token信息
-        """
-        request_url = "https://api.bitmarttest.com/user-center/token/login/test"
-        request_data = {
-            "loginName": email
-        }
-        response = self.request.post_request(request_url, request_data)
-        if not response.get('data').get('accessToken'):
-           return response['data']['accessToken']
-
-
-if __name__ == '__main__':
-    config = Config
-    config.get_token("jhoifzw-gv@tempmail.cn")

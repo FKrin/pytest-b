@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2018/7/19 下午5:22
-# @Author  : WangJuan
-# @File    : Request.py
+# @Author: fankang
+# @Time: 2022/6/25 16:27
 
 """
 封装request
@@ -12,16 +10,12 @@ import os
 import random
 import requests
 import Common.Consts
-from Common import Session
 from requests_toolbelt import MultipartEncoder
 
 
 class Request:
-    def __init__(self, env):
-        self.session = Session.Session()
-        self.get_session = self.session.get_session(env)
 
-    def get_request(self, url, data, header):
+    def get_request(self, url, data, header=None):
         """
         Get请求
         :param url:
@@ -30,15 +24,11 @@ class Request:
         :return:
 
         """
-        if not url.startswith('http://'):
-            url = '%s%s' % ('http://', url)
-            print(url)
-
         try:
             if data is None:
-                response = requests.get(url=url, headers=header, cookies=self.get_session)
+                response = requests.get(url=url, headers=header, verify=False)
             else:
-                response = requests.get(url=url, params=data, headers=header, cookies=self.get_session)
+                response = requests.get(url=url, params=data, headers=header, verify=False)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
@@ -50,23 +40,8 @@ class Request:
             print(e)
             return ()
 
-        time_consuming = response.elapsed.microseconds/1000
-        time_total = response.elapsed.total_seconds()
-
-        Common.Consts.STRESS_LIST.append(time_consuming)
-
-        response_dicts = dict()
-        response_dicts['code'] = response.status_code
-        try:
-            response_dicts['body'] = response.json()
-        except Exception as e:
-            print(e)
-            response_dicts['body'] = ''
-        response_dicts['text'] = response.text
-        response_dicts['time_consuming'] = time_consuming
-        response_dicts['time_total'] = time_total
-
-        return response_dicts
+        handled_response = response_handle(response)
+        return handled_response
 
     def post_request(self, url, data, header=None):
         """
@@ -77,14 +52,11 @@ class Request:
         :return:
 
         """
-        if not url.startswith('http://'):
-            url = '%s%s' % ('http://', url)
-            print(url)
         try:
             if data is None:
-                response = requests.post(url=url, headers=header, cookies=self.get_session)
+                response = requests.post(url=url, headers=header, verify=False)
             else:
-                response = requests.post(url=url, params=data, headers=header, cookies=self.get_session)
+                response = requests.post(url=url, params=data, headers=header, verify=False)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
@@ -96,26 +68,8 @@ class Request:
             print(e)
             return ()
 
-        # time_consuming为响应时间，单位为毫秒
-        time_consuming = response.elapsed.microseconds/1000
-        # time_total为响应时间，单位为秒
-        time_total = response.elapsed.total_seconds()
-
-        Common.Consts.STRESS_LIST.append(time_consuming)
-
-        response_dicts = dict()
-        response_dicts['code'] = response.status_code
-        try:
-            response_dicts['body'] = response.json()
-        except Exception as e:
-            print(e)
-            response_dicts['body'] = ''
-
-        response_dicts['text'] = response.text
-        response_dicts['time_consuming'] = time_consuming
-        response_dicts['time_total'] = time_total
-
-        return response_dicts
+        handled_response = response_handle(response)
+        return handled_response
 
     def post_request_multipart(self, url, data, header, file_parm, file, f_type):
         """
@@ -128,12 +82,9 @@ class Request:
         :param type:
         :return:
         """
-        if not url.startswith('http://'):
-            url = '%s%s' % ('http://', url)
-            print(url)
         try:
             if data is None:
-                response = requests.post(url=url, headers=header, cookies=self.get_session)
+                response = requests.post(url=url, headers=header, verify=False)
             else:
                 data[file_parm] = os.path.basename(file), open(file, 'rb'), f_type
 
@@ -143,7 +94,7 @@ class Request:
                 )
 
                 header['Content-Type'] = enc.content_type
-                response = requests.post(url=url, params=data, headers=header, cookies=self.get_session)
+                response = requests.post(url=url, params=data, headers=header, verify=False)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
@@ -155,26 +106,8 @@ class Request:
             print(e)
             return ()
 
-        # time_consuming为响应时间，单位为毫秒
-        time_consuming = response.elapsed.microseconds/1000
-        # time_total为响应时间，单位为秒
-        time_total = response.elapsed.total_seconds()
-
-        Common.Consts.STRESS_LIST.append(time_consuming)
-
-        response_dicts = dict()
-        response_dicts['code'] = response.status_code
-        try:
-            response_dicts['body'] = response.json()
-        except Exception as e:
-            print(e)
-            response_dicts['body'] = ''
-
-        response_dicts['text'] = response.text
-        response_dicts['time_consuming'] = time_consuming
-        response_dicts['time_total'] = time_total
-
-        return response_dicts
+        handled_response = response_handle(response)
+        return handled_response
 
     def put_request(self, url, data, header):
         """
@@ -183,17 +116,12 @@ class Request:
         :param data:
         :param header:
         :return:
-
         """
-        if not url.startswith('http://'):
-            url = '%s%s' % ('http://', url)
-            print(url)
-
         try:
             if data is None:
-                response = requests.put(url=url, headers=header, cookies=self.get_session)
+                response = requests.put(url=url, headers=header, verify=False)
             else:
-                response = requests.put(url=url, params=data, headers=header, cookies=self.get_session)
+                response = requests.put(url=url, params=data, headers=header, verify=False)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
@@ -205,20 +133,24 @@ class Request:
             print(e)
             return ()
 
-        time_consuming = response.elapsed.microseconds/1000
-        time_total = response.elapsed.total_seconds()
+        handled_response = response_handle(response)
+        return handled_response
 
-        Common.Consts.STRESS_LIST.append(time_consuming)
+def response_handle(response):
+    time_consuming = response.elapsed.microseconds / 1000
+    time_total = response.elapsed.total_seconds()
 
-        response_dicts = dict()
-        response_dicts['code'] = response.status_code
-        try:
-            response_dicts['body'] = response.json()
-        except Exception as e:
-            print(e)
-            response_dicts['body'] = ''
-        response_dicts['text'] = response.text
-        response_dicts['time_consuming'] = time_consuming
-        response_dicts['time_total'] = time_total
+    Common.Consts.STRESS_LIST.append(time_consuming)
 
-        return response_dicts
+    response_dicts = dict()
+    response_dicts['code'] = response.status_code
+    try:
+        response_dicts['body'] = response.json()
+    except Exception as e:
+        print(e)
+        response_dicts['body'] = ''
+    response_dicts['text'] = response.text
+    response_dicts['time_consuming'] = time_consuming
+    response_dicts['time_total'] = time_total
+
+    return response_dicts

@@ -21,6 +21,7 @@ import allure
 import pytest
 
 from Conf.Config import Config
+from Conf.Token import Token
 from Common import Consts
 
 
@@ -37,6 +38,14 @@ def action():
     allure.environment(tester=tester)
     return env
 
+
+@pytest.fixture()
+def account():
+    t = Token()
+    is_success, token = t.get_token("jhoifzw-gv@tempmail.cn")
+    if is_success:
+        Config.VALUE_AUTHORIZATION = token
+        return True
 
 
 
