@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2018/7/31 上午10:42
-# @Author  : WangJuan
-# @File    : run.py
+# @Author: fankang
+# @Time: 2022/6/25 16:27
 
 """
 运行用例集：
@@ -23,7 +21,6 @@ from Common import Email
 if __name__ == '__main__':
     conf = Config.Config()
     log = Log.MyLog()
-    log.info('初始化配置文件, path=' + conf.conf_path)
 
     shell = Shell.Shell()
     xml_report_path = conf.xml_report_path
@@ -38,13 +35,13 @@ if __name__ == '__main__':
     try:
         shell.invoke(cmd)
     except Exception:
-        log.error('执行用例失败，请检查环境配置')
+        log.error('生成报告失败，请检查环境配置')
         raise
 
-    try:
-        mail = Email.SendMail()
-        mail.sendMail()
-    except Exception as e:
-        log.error('发送邮件失败，请检查邮件配置')
-        raise
+    # try:
+    #     mail = Email.SendMail()
+    #     mail.sendMail()
+    # except Exception as e:
+    #     log.error('发送邮件失败，请检查邮件配置')
+    #     raise
 

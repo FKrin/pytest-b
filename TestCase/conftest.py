@@ -23,6 +23,7 @@ import pytest
 from Conf.Config import Config
 from Conf.Token import Token
 from Common import Consts
+from Common.Log import MyLog as log
 
 
 @pytest.fixture()
@@ -44,7 +45,8 @@ def account():
     t = Token()
     is_success, token = t.get_token("jhoifzw-gv@tempmail.cn")
     if is_success:
-        Config.VALUE_AUTHORIZATION = token
+        Config.TEST_AUTHORIZATION = token
+        log.info(f"TEST_AUTHORIZATION:{Config.TEST_AUTHORIZATION}")
         return True
 
 

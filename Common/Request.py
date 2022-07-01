@@ -5,12 +5,13 @@
 封装request
 
 """
-
 import os
 import random
 import requests
 import Common.Consts
 from requests_toolbelt import MultipartEncoder
+
+from Common.Log import MyLog as log
 
 
 class Request:
@@ -29,15 +30,18 @@ class Request:
                 response = requests.get(url=url, headers=header, verify=False)
             else:
                 response = requests.get(url=url, params=data, headers=header, verify=False)
+            log.info(url)
+            log.info(header)
+            log.info(data)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         except Exception as e:
             print('%s%s' % ('Exception url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         handled_response = response_handle(response)
@@ -57,15 +61,18 @@ class Request:
                 response = requests.post(url=url, headers=header, verify=False)
             else:
                 response = requests.post(url=url, params=data, headers=header, verify=False)
+            log.info(url)
+            log.info(header)
+            log.info(data)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         except Exception as e:
             print('%s%s' % ('Exception url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         handled_response = response_handle(response)
@@ -95,15 +102,18 @@ class Request:
 
                 header['Content-Type'] = enc.content_type
                 response = requests.post(url=url, params=data, headers=header, verify=False)
+            log.info(url)
+            log.info(header)
+            log.info(data)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         except Exception as e:
             print('%s%s' % ('Exception url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         handled_response = response_handle(response)
@@ -122,15 +132,18 @@ class Request:
                 response = requests.put(url=url, headers=header, verify=False)
             else:
                 response = requests.put(url=url, params=data, headers=header, verify=False)
+            log.info(url)
+            log.info(header)
+            log.info(data)
 
         except requests.RequestException as e:
             print('%s%s' % ('RequestException url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         except Exception as e:
             print('%s%s' % ('Exception url: ', url))
-            print(e)
+            log.error(e)
             return ()
 
         handled_response = response_handle(response)
@@ -138,7 +151,6 @@ class Request:
 
 def response_handle(response):
     time_consuming = response.elapsed.microseconds / 1000
-    time_total = response.elapsed.total_seconds()
 
     Common.Consts.STRESS_LIST.append(time_consuming)
 
@@ -147,10 +159,9 @@ def response_handle(response):
     try:
         response_dicts['body'] = response.json()
     except Exception as e:
-        print(e)
+        log.error(e)
         response_dicts['body'] = ''
-    response_dicts['text'] = response.text
     response_dicts['time_consuming'] = time_consuming
-    response_dicts['time_total'] = time_total
 
+    log.info(response_dicts)
     return response_dicts
